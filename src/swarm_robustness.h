@@ -13,6 +13,8 @@
 
 /* Definition of the positioning sensor */
 #include <argos3/plugins/robots/generic/control_interface/ci_positioning_sensor.h>
+/* Definition of the light sensor */
+#include <argos3/plugins/robots/generic/control_interface/ci_light_sensor.h>
 
 using namespace argos;
 
@@ -54,11 +56,15 @@ public:
    virtual void Destroy();
 
 private:
+   /* indicates whether the beacon has been detetected by the lignt
+      sensor*/
+   bool beacon_detected;
 
    /* Pointer to the differential steering actuator */
    CCI_DifferentialSteeringActuator* m_pcWheels;
    /* Pointer to the e-puck proximity sensor */
    CCI_ProximitySensor* m_pcProximity;
-   
+   /* Pointer to the light sensor */
+   CCI_LightSensor* m_pcLight;
 };
 #endif
