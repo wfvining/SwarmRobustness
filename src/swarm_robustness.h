@@ -11,8 +11,6 @@
 /* Definition of proximity sensor */
 #include <argos3/plugins/robots/generic/control_interface/ci_proximity_sensor.h>
 
-/* Definition of the positioning sensor */
-#include <argos3/plugins/robots/generic/control_interface/ci_positioning_sensor.h>
 /* Definition of the light sensor */
 #include <argos3/plugins/robots/generic/control_interface/ci_light_sensor.h>
 
@@ -66,5 +64,11 @@ private:
    CCI_ProximitySensor* m_pcProximity;
    /* Pointer to the light sensor */
    CCI_LightSensor* m_pcLight;
+
+   /**
+    * Check light sensor readings to determine if the beacon is in
+    * sight.
+    */
+   void BeaconInSight();
 };
 #endif
