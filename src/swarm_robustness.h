@@ -66,5 +66,11 @@ private:
    CCI_ProximitySensor* m_pcProximity;
    /* Pointer to the light sensor */
    CCI_LightSensor* m_pcLight;
+
+   /**
+    * Check the light sensor beacon to determine if the beacon is in
+    * sight.
+    */
+   void BeaconInSight();
 };
 #endif
