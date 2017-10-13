@@ -36,64 +36,40 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="5, 5, 1" center="0,0,0.5">
+  <arena size="10, 10, 1" center="0,0,0.5">
 
-    <box id="wall_north" size="4,0.1,0.5" movable="false">
-      <body position="0,2,0" orientation="0,0,0" />
+    <!-- Put the LED light next to the west wall -->
+    <light id="light"
+       position="-3.85,0,0.1"
+       orientation="0,0,0"
+       color="yellow"
+       intensity="3.0"
+       medium="leds" />
+
+    <box id="wall_north" size="8,0.1,0.5" movable="false">
+      <body position="0,4,0" orientation="0,0,0" />
     </box>
-    <box id="wall_south" size="4,0.1,0.5" movable="false">
-      <body position="0,-2,0" orientation="0,0,0" />
+    <box id="wall_south" size="8,0.1,0.5" movable="false">
+      <body position="0,-4,0" orientation="0,0,0" />
     </box>
-    <box id="wall_east" size="0.1,4,0.5" movable="false">
-      <body position="2,0,0" orientation="0,0,0" />
+    <box id="wall_east" size="0.1,8,0.5" movable="false">
+      <body position="4,0,0" orientation="0,0,0" />
     </box>
-    <box id="wall_west" size="0.1,4,0.5" movable="false">
-      <body position="-2,0,0" orientation="0,0,0" />
+    <box id="wall_west" size="0.1,8,0.5" movable="false">
+      <body position="-4,0,0" orientation="0,0,0" />
     </box>
 
-    <!--
-        You can distribute entities randomly. Here, we distribute
-        10 e-pucks in this way:
-        - the position is uniformly distributed
-        on the ground, in the square whose corners are (-2,-2) and (2,2)
-        - the orientations are non-zero only when rotating around Z and chosen
-        from a gaussian distribution, whose mean is zero degrees and
-        standard deviation is 360 degrees.
-    -->
+    <!-- Distribute our robots in a cluster near the east wall -->
     <distribute>
-      <position method="uniform" min="-2,-2,0" max="2,2,0" />
+      <position method="uniform" min="1,-1,0" max="3,1,0" />
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
       <!-- Entity means number of robots -->
-      <entity quantity="5" max_trials="100">
+      <entity quantity="30" max_trials="100">
         <e-puck id="fb">
           <controller config="fdc" />
         </e-puck>
       </entity>
     </distribute>
-
-    <!--
-        We distribute 5 boxes uniformly in position and rotation around Z.
-    -->
-<!--     <distribute>
-      <position method="uniform" min="-2,-2,0" max="2,2,0" />
-      <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="0" max_trials="100">
-        <box id="b" size="0.3,0.3,0.5" movable="false" />
-      </entity>
-    </distribute> -->
-
-    <!--
-        We distribute cylinders uniformly in position and with
-        constant rotation (rotating a cylinder around Z does not
-        matter)
-    -->
-    <!-- <distribute>
-      <position method="uniform" min="-2,-2,0" max="2,2,0" />
-      <orientation method="constant" values="0,0,0" />
-      <entity quantity="0" max_trials="100">
-        <cylinder id="c" height="0.5" radius="0.15" movable="false" />
-      </entity>
-    </distribute> -->
 
   </arena>
 
@@ -107,7 +83,9 @@
   <!-- ********* -->
   <!-- * Media * -->
   <!-- ********* -->
-  <media />
+  <media>
+    <led id="leds" />
+  </media>
 
   <!-- ****************** -->
   <!-- * Visualization * -->
