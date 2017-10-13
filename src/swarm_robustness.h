@@ -12,6 +12,10 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_proximity_sensor.h>
 /* Definition of the light sensor */
 #include <argos3/plugins/robots/generic/control_interface/ci_light_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
+/* Logging */
+#include <argos3/core/utility/logging/argos_log.h>
 
 using namespace argos;
 
@@ -63,11 +67,15 @@ private:
    CCI_ProximitySensor* m_pcProximity;
    /* Pointer to the light sensor */
    CCI_LightSensor* m_pcLight;
+   /* Pointer to the range and bearing sensor/actuator */
+   CCI_RangeAndBearingSensor   *m_pcRABS;
+   CCI_RangeAndBearingActuator *m_pcRABA;
 
    /**
     * Check the light sensor beacon to determine if the beacon is in
     * sight.
     */
    void BeaconInSight();
+   CRadians SwarmDirection();
 };
 #endif

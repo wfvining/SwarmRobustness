@@ -5,14 +5,20 @@ SwarmRobustness::SwarmRobustness() {}
 SwarmRobustness::~SwarmRobustness() {}
 
 void SwarmRobustness::ControlStep()
-{}
+{
+   SwarmDirection();
+}
 
 void SwarmRobustness::Destroy()
 {}
 
 void SwarmRobustness::Init(TConfigurationNode& t_node)
 {
-   // TODO
+   m_pcWheels    = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
+   m_pcProximity = GetSensor  <CCI_ProximitySensor             >("proximity");
+   m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
+   m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
+   m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
 }
 
 void SwarmRobustness::BeaconInSight()
@@ -34,6 +40,27 @@ void SwarmRobustness::BeaconInSight()
    {
       beacon_detected = false;
    }
+}
+
+CRadians SwarmRobustness::SwarmDirection()
+{
+   const CCI_RangeAndBearingSensor::TReadings& readings = m_pcRABS->GetReadings();
+
+   if(readings.empty()) {
+      // If there are no readings, then just keep driving.
+      // (Should maybe turn a random direction instead).
+      argos::LOG << "[" << GetId() << "]: got no range and bearing readings" << std::endl;
+      return CRadians(0.0);
+   }
+   
+   CRadians sum(0.0);
+   for( auto packet : readings )
+   {
+      sum += packet.HorizontalBearing;
+   }
+
+   // return the average bearing to all readings
+   return sum / readings.size();
 }
 
 /*
