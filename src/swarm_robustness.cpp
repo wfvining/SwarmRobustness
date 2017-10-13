@@ -6,7 +6,25 @@ SwarmRobustness::~SwarmRobustness() {}
 
 void SwarmRobustness::ControlStep()
 {
-   SwarmDirection();
+   BeaconInSight();
+   if(beacon_detected)
+   {
+      // TODO: SetCollisionAvoidanceRadius(high)
+   }
+   else
+   {
+      // TODO: SetCollisionAvoidanceRaduius(low)
+   }
+
+   if(TimeSinceLastAvoidanceCall() > turn_threshold)
+   {
+      CRadians swarm_bearing = GetSwarmBearing();
+      // TODO: turn towards swarm bearing
+   }
+   else
+   {
+      // TODO: Drive while avoiding obstacles
+   }
 }
 
 void SwarmRobustness::Destroy()
@@ -19,6 +37,11 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
    m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
    m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
    m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
+}
+
+int SwarmRobustness::TimeSinceLastAvoidanceCall()
+{
+   return 10; // TODO: actually return something true
 }
 
 void SwarmRobustness::BeaconInSight()
@@ -42,7 +65,7 @@ void SwarmRobustness::BeaconInSight()
    }
 }
 
-CRadians SwarmRobustness::SwarmDirection()
+CRadians SwarmRobustness::GetSwarmBearing()
 {
    const CCI_RangeAndBearingSensor::TReadings& readings = m_pcRABS->GetReadings();
 

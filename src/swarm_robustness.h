@@ -60,6 +60,7 @@ private:
    /* indicates whether the beacon has been detetected by the lignt
       sensor*/
    bool beacon_detected;
+   const int turn_threshold = 100; // TODO: define this as a time
 
    /* Pointer to the differential steering actuator */
    CCI_DifferentialSteeringActuator* m_pcWheels;
@@ -76,6 +77,7 @@ private:
     * sight.
     */
    void BeaconInSight();
-   CRadians SwarmDirection();
+   CRadians GetSwarmBearing();
+   int TimeSinceLastAvoidanceCall();
 };
 #endif
