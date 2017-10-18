@@ -17,6 +17,9 @@
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
 
+#include "data.h"
+#include "obstacle.h"
+
 using namespace argos;
 
 class SwarmRobustness : public CCI_Controller
@@ -57,6 +60,9 @@ public:
    virtual void Destroy();
 
 private:
+
+   ObstSensors obstsense;
+
    /* indicates whether the beacon has been detetected by the lignt
       sensor*/
    bool beacon_detected;
