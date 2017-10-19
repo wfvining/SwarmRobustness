@@ -1,12 +1,18 @@
 #include "swarm_robustness.h"
 
-SwarmRobustness::SwarmRobustness() {}
+SwarmRobustness::SwarmRobustness()
+{
+    //Constructor
+}
 
 SwarmRobustness::~SwarmRobustness() {}
 
 void SwarmRobustness::ControlStep()
 {
-   BeaconInSight();
+    //Create Wheel Data Object
+    DATA wheeldata;
+
+/*   BeaconInSight();
    if(beacon_detected)
    {
       // TODO: SetCollisionAvoidanceRadius(high)
@@ -25,6 +31,42 @@ void SwarmRobustness::ControlStep()
    {
       // TODO: Drive while avoiding obstacles
    }
+*/
+
+
+    //Obstacle Avoidance
+
+    //Set Variables to 0;
+    obstsense.distance = m_pcProximity->GetReadings()[0];
+    obstsense.sensorID = 0;
+
+    //Create ObstController
+    Obstacle obstController;
+
+    if(obstController.ShouldAvoid(&obstsense))
+    {
+        if(obstsense.turnRight)
+        {
+            wheeldata.rwVel = 2.5;
+            wheeldata.lwVel = 0;
+        }
+        else
+        {
+            wheeldata.rwVel = 0;
+            wheeldata.lwVel = 2.5;
+        }
+    }
+    else
+    {
+        wheeldata.lwVel = 2.5;
+        wheeldata.rwVel = 2.5;
+    }
+
+                                   //rightwheel, leftwheel
+    m_pcWheels->SetLinearVelocity(wheeldata.rwVel, wheeldata.lwVel);
+
+    argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
+
 }
 
 void SwarmRobustness::Destroy()
