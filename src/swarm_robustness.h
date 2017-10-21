@@ -61,6 +61,13 @@ public:
 
 private:
 
+   enum FailureMode {
+      NO_FAILURE = 0, /* Robots magically do not fail      */
+      MOTOR_FAILURE,  /* failure of a robot's motors only  */
+      POWER_FAILURE,  /* complete failure of a robot       */
+      SENSOR_FAILURE  /* failure of a robot's sensors only */
+   } failure_mode;
+
    ObstSensors obstsense;
 
    /* indicates whether the beacon has been detetected by the lignt

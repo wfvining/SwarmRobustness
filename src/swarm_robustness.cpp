@@ -79,6 +79,30 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
    m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
    m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
    m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
+
+   // get the failure mode from the config.
+   int fm;
+   GetNodeAttributeOrDefault(t_node, "failure_mode", fm, 0);
+   if(fm == 0)
+   {
+      failure_mode = NO_FAILURE;
+      argos::LOG << "failure mode: NO_FAILURE" << std::endl;
+   }
+   else if(fm == 1)
+   {
+      failure_mode = MOTOR_FAILURE;
+      argos::LOG << "failure mode: MOTOR_FAILURE" << std::endl;
+   }
+   else if(fm == 2)
+   {
+      failure_mode = POWER_FAILURE;
+      argos::LOG << "failure mode: POWER_FAILURE" << std::endl;
+   }
+   else if(fm == 3)
+   {
+      failure_mode = SENSOR_FAILURE;
+      argos::LOG << "failure mode: SENSOR_FAILURE" << std::endl;
+   }
 }
 
 int SwarmRobustness::TimeSinceLastAvoidanceCall()
