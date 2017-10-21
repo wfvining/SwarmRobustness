@@ -2,120 +2,66 @@
 #include <stdlib.h>
 #include <time.h>
 
-bool isFailed = false;
-int failureType = 0; // 0 = no failure, 1 = case 1, 2 = case 2, 3 = case 3 as explained in paper
-int maxTimeToFail = 100; // ticks
-int scheduledFailTime = 99999999; 
+ 
+ 
+// Feel free to tune the following variables
+int failureType = 1; // 0 = no failure, 1 = case 1 failure as explained in paper, case 2 etc.
 int failureThreshold = 30; // 10 = 10% chance of failure, 50 = 50% chance of failure
+int maxFail = 165; /* maxFail represents the latest that a robot is allowed to die at. 
+  * Scale is n = n*10 steps (ex. 165 = step 1650 is latest that robot can die at) */
 
-bool isSet = false;
-int maxFail = 2000; // When's the latest that a bot is allowed to fail
-int failPercentage = 0; // The chance that this bot is going to fail
-int failTime = 99999999; // Time that the bot is supposed to fail
 
+// Values that do not require tuning.
 int hasScrambled = false;
-int maxBots = 5;
-int failBots[5];
-int failTimes[5];
-int failIndex = 0;
+int maxBots = 120;
 int numTicks;
+bool robotFailList[120]; // Boolean value if corresponding robot is going to eventually fail
+int robotFailTime[120]; // Value of time that corresponding robot is supposed to fail
+int robotMaxTime = 99999999; // Constant used for robots that are not supposed to fail
 
 SwarmRobustness::SwarmRobustness()
 {
     //Constructor
-   // std::string test = GetId().substr(2);
-   // srand(time(NULL));
-   // argos::LOG << "failPercentage: " << failPercentage << std::endl;
-   // // Decide whether robot will fail. If so determine when
-   // double failure = (rand()*1.0f/RAND_MAX) * 100;
-   // if (failure <= failureThreshold) {
-   //    isFailed = true;
-   //    scheduledFailTime = (rand()*1.0f/RAND_MAX) * maxTimeToFail;
-   // } else {
-   //    isFailed = false;
-   // }
 }
 
 
 SwarmRobustness::~SwarmRobustness() {}
 
-// void configureRobot(int myId) {
-//    argos::LOG << "MY ID: " << myId << std::endl;
-//    int i = 0;
-//    while(i++ < (myId+1)) {
-//       failPercentage = (rand() % 100) + 1;
-//       failTime = (rand() % maxFail) + 1;
-//       argos::LOG << "r: " << failPercentage << " m: " << failTime << std::endl;
-//    }
-// }
 
-bool robotIsFailed(int robotID) {
-   int i = 0;
-   while (i < maxBots) {
-      // Check robot is eventually going to fail
-      if(failBots[i] != -1) {
-         if(robotID == failBots[i]) {
-            // Check if robot is to be failed now
-            if(failTimes[i] <= numTicks) {
-               return true;
-            } else {
-               return false;
-            }
-         }
-      }
+bool robotIsFailed(int robotId, int numTicks) {
+   if (robotFailList[robotId] == true && robotFailTime[robotId] <= (numTicks/10)) {
+      return true;
    }
    return false;
 }
 
 void SwarmRobustness::ControlStep()
 {
+   // myId and numTicks++ lines must stay as first in order to work.
    int myId = std::stoi (GetId().substr(2),nullptr);
-   if (robotIsFailed(myId)) {
-      m_pcWheels->SetLinearVelocity(0, 0);
-      return;
-   }
-   // if (!isSet) {
-   //    argos::LOG << "MY ID: " << myId << std::endl;
-   //    int i = 0;
-   //    while(i++ < (myId+1)) {
-   //       failPercentage = (rand() % 100) + 1;
-   //       failTime = (rand() % maxFail) + 1;
-   //       argos::LOG << "r: " << failPercentage << " m: " << failTime << std::endl;
-   //    }
-   //    // configureRobot(myId);
-   //    isSet = true;
-   // }
+   if (myId == 0) numTicks ++;
 
    //Create Wheel Data Object
    DATA wheeldata;
-   // argos::LOG << "Fail time: " << scheduledFailTime << " ID: " << GetId() << " w: " << (rand()*1.0f/RAND_MAX) * 100 << std::endl;
-   argos::LOG << "ID: " << GetId() << "failTime: " << failTime << std::endl;
 
-   // // Logic if this robot is failed
-   // if (isFailed) {
-   //    switch(failureType)
-   //    {
-   //    case 1 : // Complete failures of individual robot
-   //       // Shut off wheels
-   //       m_pcWheels->SetLinearVelocity(0, 0);
-   //       argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
-
-   //       // Shut off LED emitter
-
-   //       // Once everything is turned off return
-   //       return;
-   //       break;
-   //    case 2 : // Failure of a robot's IR sensors. Wanders around lost
-   //       break;
-   //    case 3 : // Failure of a robot's motors only
-   //       m_pcWheels->SetLinearVelocity(0, 0);
-   //       argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
-   //       return;
-   //       break;
-   //    default : // Nothing
-   //       break;
-   //    }
-   // }
+   // When a robot fails perform its corresponding failure case.
+   if (robotIsFailed(myId, numTicks)) {
+      switch(failureType)
+      {
+      case 1 : // Complete failure of individual robot
+         m_pcWheels->SetLinearVelocity(0, 0);
+         return;
+         break;
+      case 2 : // Failure of a robot's IR sensors. Wanders around lost
+         break;
+      case 3 : // Failure of a robot's motors only
+         m_pcWheels->SetLinearVelocity(0, 0);
+         return;
+         break;
+      default : // Nothing
+         break;
+      }
+   }
 
 
 /*   BeaconInSight();
@@ -171,8 +117,7 @@ void SwarmRobustness::ControlStep()
                                    //rightwheel, leftwheel
     m_pcWheels->SetLinearVelocity(wheeldata.rwVel, wheeldata.lwVel);
 
-    argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
-    if (myId == 0) numTicks ++;
+    // argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
 }
 
 void SwarmRobustness::Destroy()
@@ -186,45 +131,30 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
    m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
    m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
 
-   // All bots split the same rand generator. While loop adds diversity to rand generator output.
-   // int myId = std::stoi (GetId().substr(2),nullptr);
-   // argos::LOG << "MY ID: " << myId << std::endl;
-   // int i = 0;
-   // while(i++ < (myId+1)) {
-   //    failPercentage = (rand() % 100) + 1;
-   //    failTime = (rand() % maxFail) + 1;
-   //    argos::LOG << "r: " << failPercentage << " m: " << failTime << std::endl;
-   // }
-
-   // TODO: Make list of who fails and when they fail
-   // Then in the control step if statement will fail based if their id is within that list
    int i = 0;
-   int failPercentage = 50;
-   int maxFail = 165;
    int time = -1;
-   // srand(time(NULL));
    if (!hasScrambled) {
       while(i < maxBots) {
          int fail = (rand() % 100) + 1;
-         argos::LOG << "i: " << i << " fail: " << fail << std::endl;
+         // argos::LOG << "i: " << i << " fail: " << fail << std::endl;
 
          // If true then robot will fail. Now determine when to fail.
          if (fail <= failureThreshold) {
             time = (rand() % maxFail) + 1;
-            failBots[i] = i;
-            failTimes[i] = time;
+            // argos::LOG << "time: " << time << std::endl;
+            robotFailTime[i] = time;
+            robotFailList[i] = true;
          } else {
-            failBots[i] = -1;
-            failTimes[i] = 99999999;
+            robotFailTime[i] = robotMaxTime;
+            robotFailList[i] = false;
          }
-         argos::LOG << "failBots: " << failBots[i] << " failTime: " << failTimes[i] << std::endl;
+         // argos::LOG << "robot: " << i << " failTime: " << robotFailTime[i] << std::endl;
          i++;
-         // failIndex ++;
       }
       hasScrambled = true;
    }
-   numTicks = 0;
-   argos::LOG << "FINISHED INIT" << std::endl;
+   numTicks = -1; // Must be set to -1 because how it is incremented in ControlStep
+   // argos::LOG << "FINISHED INIT" << std::endl;
 }
 
 int SwarmRobustness::TimeSinceLastAvoidanceCall()
