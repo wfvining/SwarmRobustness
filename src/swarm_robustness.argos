@@ -6,6 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
+    <!-- Length will determine how long to run the experiment -->
     <experiment length="0"
                 ticks_per_second="10"
                 random_seed="124" />
@@ -62,8 +63,8 @@
     <distribute>
       <position method="uniform" min="1,-1,0" max="3,1,0" />
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
-      <!-- Entity means number of robots -->
-      <entity quantity="30" max_trials="100">
+      <!-- Entity means number of robots. Max_trials can be used instead of a bash script. -->
+      <entity quantity="5" max_trials="100">
         <e-puck id="fb">
           <controller config="fdc" />
         </e-puck>
@@ -91,6 +92,7 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
+    <!-- Comment qt-opengl out in order to run headless -->
     <qt-opengl />
   </visualization>
 
