@@ -112,6 +112,11 @@ int SwarmRobustness::TimeSinceLastAvoidanceCall()
 
 void SwarmRobustness::BeaconInSight()
 {
+   if(failed == SENSOR_FAILURE) {
+      beacon_detected = false;
+      return;
+   }
+   
    Real total_reading = 0.0;
    const std::vector<Real> readings = m_pcLight->GetReadings();
    for(Real reading : readings)
@@ -135,10 +140,8 @@ CRadians SwarmRobustness::GetSwarmBearing()
 {
    const CCI_RangeAndBearingSensor::TReadings& readings = m_pcRABS->GetReadings();
 
-   if(readings.empty()) {
-      // If there are no readings, then just keep driving.
-      // (Should maybe turn a random direction instead).
-      argos::LOG << "[" << GetId() << "]: got no range and bearing readings" << std::endl;
+   if(failed == SENSOR_FAILURE) {
+      // ignore all readings.
       return CRadians(0.0);
    }
    
@@ -150,6 +153,11 @@ CRadians SwarmRobustness::GetSwarmBearing()
 
    // return the average bearing to all readings
    return sum / readings.size();
+}
+
+void SwarmRobustness::SensorFailure()
+{
+   failed = SENSOR_FAILURE;
 }
 
 /*

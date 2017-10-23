@@ -67,6 +67,7 @@ private:
       POWER_FAILURE,  /* complete failure of a robot       */
       SENSOR_FAILURE  /* failure of a robot's sensors only */
    } failure_mode;
+   FailureMode failed = NO_FAILURE;
 
    ObstSensors obstsense;
 
@@ -92,5 +93,9 @@ private:
    void BeaconInSight();
    CRadians GetSwarmBearing();
    int TimeSinceLastAvoidanceCall();
+   /**
+    * Set up sensors to simulate sensor failure.
+    */
+   void SensorFailure();
 };
 #endif
