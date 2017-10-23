@@ -5,7 +5,6 @@
  
  
 // Feel free to tune the following variables
-int failureType = 1; // 0 = no failure, 1 = case 1 failure as explained in paper, case 2 etc.
 int failureThreshold = 30; // 10 = 10% chance of failure, 50 = 50% chance of failure
 int maxFail = 165; /* maxFail represents the latest that a robot is allowed to die at. 
   * Scale is n = n*10 steps (ex. 165 = step 1650 is latest that robot can die at) */
@@ -46,7 +45,7 @@ void SwarmRobustness::ControlStep()
 
    // When a robot fails perform its corresponding failure case.
    if (robotIsFailed(myId, numTicks)) {
-      switch(failureType)
+      switch(failure_mode)
       {
       case 1 : // Complete failure of individual robot
          m_pcWheels->SetLinearVelocity(0, 0);
@@ -141,7 +140,10 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
          // If true then robot will fail. Now determine when to fail.
          if (fail <= failureThreshold) {
             time = (rand() % maxFail) + 1;
+            // TODO: get different random values using just 1 build
             // argos::LOG << "time: " << time << std::endl;
+            // int george = (rand()*1.0f/RAND_MAX) * maxFail;
+            // argos::LOG << "george: " << george << std::endl;
             robotFailTime[i] = time;
             robotFailList[i] = true;
          } else {
@@ -154,7 +156,7 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
       hasScrambled = true;
    }
    numTicks = -1; // Must be set to -1 because how it is incremented in ControlStep
-   // argos::LOG << "FINISHED INIT" << std::endl;
+
    // get the failure mode from the config.
    int fm;
    GetNodeAttributeOrDefault(t_node, "failure_mode", fm, 0);
@@ -243,5 +245,4 @@ void SwarmRobustness::SensorFailure()
  * See also the XML configuration files for an example of how this is used.
  */
 REGISTER_CONTROLLER(SwarmRobustness, "swarm_robustness_controller")
-
 
