@@ -155,6 +155,29 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
    }
    numTicks = -1; // Must be set to -1 because how it is incremented in ControlStep
    // argos::LOG << "FINISHED INIT" << std::endl;
+   // get the failure mode from the config.
+   int fm;
+   GetNodeAttributeOrDefault(t_node, "failure_mode", fm, 0);
+   if(fm == 0)
+   {
+      failure_mode = NO_FAILURE;
+      argos::LOG << "failure mode: NO_FAILURE" << std::endl;
+   }
+   else if(fm == 1)
+   {
+      failure_mode = MOTOR_FAILURE;
+      argos::LOG << "failure mode: MOTOR_FAILURE" << std::endl;
+   }
+   else if(fm == 2)
+   {
+      failure_mode = POWER_FAILURE;
+      argos::LOG << "failure mode: POWER_FAILURE" << std::endl;
+   }
+   else if(fm == 3)
+   {
+      failure_mode = SENSOR_FAILURE;
+      argos::LOG << "failure mode: SENSOR_FAILURE" << std::endl;
+   }
 }
 
 int SwarmRobustness::TimeSinceLastAvoidanceCall()
@@ -164,6 +187,11 @@ int SwarmRobustness::TimeSinceLastAvoidanceCall()
 
 void SwarmRobustness::BeaconInSight()
 {
+   if(failed == SENSOR_FAILURE) {
+      beacon_detected = false;
+      return;
+   }
+   
    Real total_reading = 0.0;
    const std::vector<Real> readings = m_pcLight->GetReadings();
    for(Real reading : readings)
@@ -187,10 +215,8 @@ CRadians SwarmRobustness::GetSwarmBearing()
 {
    const CCI_RangeAndBearingSensor::TReadings& readings = m_pcRABS->GetReadings();
 
-   if(readings.empty()) {
-      // If there are no readings, then just keep driving.
-      // (Should maybe turn a random direction instead).
-      argos::LOG << "[" << GetId() << "]: got no range and bearing readings" << std::endl;
+   if(failed == SENSOR_FAILURE) {
+      // ignore all readings.
       return CRadians(0.0);
    }
    
@@ -202,6 +228,11 @@ CRadians SwarmRobustness::GetSwarmBearing()
 
    // return the average bearing to all readings
    return sum / readings.size();
+}
+
+void SwarmRobustness::SensorFailure()
+{
+   failed = SENSOR_FAILURE;
 }
 
 /*

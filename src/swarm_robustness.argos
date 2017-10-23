@@ -28,7 +28,12 @@
         <light implementation="default" show_rays="true" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="1" />
       </sensors>
-      <params velocity="5" />
+      <!-- Failure Modes     -->
+      <!-- 0: NO_FAILURE     -->
+      <!-- 1: MOTOR_FAILURE  -->
+      <!-- 2: POWER_FAILURE  -->
+      <!-- 3: SENSOR_FAILURE -->
+      <params velocity="5" failure_mode="0"/>
     </swarm_robustness_controller>
 
   </controllers>
