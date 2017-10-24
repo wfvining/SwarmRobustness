@@ -82,7 +82,7 @@ void SwarmRobustness::ControlStep()
 
         /*-----FLOCKING CODE-----*/
 
-        float tolerance = 5;
+        float tolerance = 25;
 
         // if dist >= tolerance
         if(flocking)
