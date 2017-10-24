@@ -47,15 +47,17 @@ void SwarmRobustness::ControlStep()
    if (robotIsFailed(myId, numTicks)) {
       switch(failure_mode)
       {
-      case 1 : // Complete failure of individual robot
+      case MOTOR_FAILURE : // Failure of a robot's motors only
          m_pcWheels->SetLinearVelocity(0, 0);
          return;
          break;
-      case 2 : // Failure of a robot's IR sensors. Wanders around lost
-         break;
-      case 3 : // Failure of a robot's motors only
+      case POWER_FAILURE : // Complete failure of individual robot
          m_pcWheels->SetLinearVelocity(0, 0);
+         SensorFailure();
          return;
+         break;
+      case SENSOR_FAILURE : // Failure of a robot's IR sensors. Wanders around lost
+         SensorFailure();
          break;
       default : // Nothing
          break;
