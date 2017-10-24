@@ -1,7 +1,7 @@
 #include "swarm_robustness.h"
 #include <stdlib.h>
 #include <time.h>
-
+#include <argos3/core/utility/math/rng.h>
  
  
 // Feel free to tune the following variables
@@ -17,6 +17,8 @@ int numTicks;
 bool robotFailList[120]; // Boolean value if corresponding robot is going to eventually fail
 int robotFailTime[120]; // Value of time that corresponding robot is supposed to fail
 int robotMaxTime = 99999999; // Constant used for robots that are not supposed to fail
+
+// CRandom::CRNG *rand;
 
 SwarmRobustness::SwarmRobustness()
 {
@@ -195,19 +197,27 @@ void SwarmRobustness::Init(TConfigurationNode& t_node)
    m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
    m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
    m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
+   // m_pcRNG       = CRandom::CreateRNG("argos");
+
+   rand = argos::CRandom::CreateRNG("argos");
+  // SInt32 argos::CRandom::CRNG::Uniform  ( const CRange< SInt32 > &  c_range ) 
+
+
 
    int i = 0;
    int time = -1;
    if (!hasScrambled) {
       while(i < maxBots) {
-         int fail = (rand() % 100) + 1;
+         // int fail = (rand() % 100) + 1;
+         int fail = rand->Uniform(argos::CRange<int>(0,100));
          // argos::LOG << "i: " << i << " fail: " << fail << std::endl;
 
          // If true then robot will fail. Now determine when to fail.
          if (fail <= failureThreshold) {
-            time = (rand() % maxFail) + 1;
+            // time = (rand() % maxFail) + 1;
+            time = rand->Uniform(argos::CRange<int>(0,maxFail));
             // TODO: get different random values using just 1 build
-            // argos::LOG << "time: " << time << std::endl;
+            argos::LOG << "time: " << time << std::endl;
             // int george = (rand()*1.0f/RAND_MAX) * maxFail;
             // argos::LOG << "george: " << george << std::endl;
             robotFailTime[i] = time;
