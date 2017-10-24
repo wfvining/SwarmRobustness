@@ -5,7 +5,10 @@ SwarmRobustness::SwarmRobustness()
     //Constructor
 }
 
-SwarmRobustness::~SwarmRobustness() {}
+SwarmRobustness::~SwarmRobustness()
+{
+    //Destructor
+}
 
 void SwarmRobustness::ControlStep()
 {
@@ -33,18 +36,34 @@ void SwarmRobustness::ControlStep()
    }
 */
 
-
     //Obstacle Avoidance
 
     //Set Variables to 0;
     obstsense.distance = m_pcProximity->GetReadings()[0];
     obstsense.sensorID = 0;
 
+    if(obstsense.distance < m_pcProximity->GetReadings()[1])
+    {
+       obstsense.distance = m_pcProximity->GetReadings()[1];
+       obstsense.sensorID = 1;
+    }
+    if(obstsense.distance < m_pcProximity->GetReadings()[7])
+    {
+       obstsense.distance = m_pcProximity->GetReadings()[7];
+       obstsense.sensorID = 7;
+    }
+    if(obstsense.distance < m_pcProximity->GetReadings()[6])
+    {
+       obstsense.distance = m_pcProximity->GetReadings()[6];
+       obstsense.sensorID = 6;
+    }
+
     //Create ObstController
     Obstacle obstController;
 
     if(obstController.ShouldAvoid(&obstsense))
     {
+        time_since_collision = 0;
         if(obstsense.turnRight)
         {
             wheeldata.rwVel = 2.5;
@@ -58,19 +77,68 @@ void SwarmRobustness::ControlStep()
     }
     else
     {
-        wheeldata.lwVel = 2.5;
-        wheeldata.rwVel = 2.5;
+        time_since_collision++;
+        // Check to see if we need to flock back
+
+        /*-----FLOCKING CODE-----*/
+
+        float tolerance = 5;
+
+        // if dist >= tolerance
+        if(flocking)
+        {
+
+            //argos::LOG << "FLOCKING" << std::endl;
+
+            // Get Error
+            CRadians errorBackToSwarm = GetSwarmBearing();
+            argos::LOG << GetId() << ": swarm bearing " << GetSwarmBearing() << std::endl;
+
+            // Determine if we are turning right or left
+            if(errorBackToSwarm > CRadians(0.0))
+            {
+                // RIGHT
+                wheeldata.lwVel = 0.0;
+                wheeldata.rwVel = 2.5;
+            }
+            else
+            {
+                // LEFT
+                wheeldata.lwVel = 0.0;
+                wheeldata.rwVel = 2.5;
+            }
+
+            // check error, if below, turn flocking behavior off
+            if(errorBackToSwarm <= CRadians(0.05) && errorBackToSwarm >= CRadians(-0.05))
+            {
+                argos::LOG << "done flocking" << std::endl;
+                flocking = false;
+                wheeldata.lwVel = 2.5;
+                wheeldata.rwVel = 2.5;
+            }
+
+        }
+        else if(time_since_collision >= tolerance)
+        {
+            flocking = true;
+        }
+        //otherwise drive straight
+        else
+        {
+            wheeldata.lwVel = 2.5;
+            wheeldata.rwVel = 2.5;
+        }
     }
 
                                    //rightwheel, leftwheel
     m_pcWheels->SetLinearVelocity(wheeldata.rwVel, wheeldata.lwVel);
 
-    argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
+//    Used to debug wheel speed
+//    argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
 
 }
 
-void SwarmRobustness::Destroy()
-{}
+void SwarmRobustness::Destroy() {   }
 
 void SwarmRobustness::Init(TConfigurationNode& t_node)
 {
@@ -112,7 +180,8 @@ int SwarmRobustness::TimeSinceLastAvoidanceCall()
 
 void SwarmRobustness::BeaconInSight()
 {
-   if(failed == SENSOR_FAILURE) {
+   if(failed == SENSOR_FAILURE)
+   {
       beacon_detected = false;
       return;
    }
@@ -140,9 +209,15 @@ CRadians SwarmRobustness::GetSwarmBearing()
 {
    const CCI_RangeAndBearingSensor::TReadings& readings = m_pcRABS->GetReadings();
 
-   if(failed == SENSOR_FAILURE) {
+   if(failed == SENSOR_FAILURE)
+   {
       // ignore all readings.
       return CRadians(0.0);
+   }
+
+   if(readings.size() == 0)
+   {
+       return CRadians(0.0);
    }
    
    CRadians sum(0.0);
