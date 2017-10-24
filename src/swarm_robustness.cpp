@@ -64,12 +64,6 @@ void SwarmRobustness::ControlStep()
 
                                    //rightwheel, leftwheel
     m_pcWheels->SetLinearVelocity(wheeldata.rwVel, wheeldata.lwVel);
-
-    // FOR TESTING.
-    if(GetId().compare("1") == 0) {
-       RABAFailure();
-    }
-    SwarmBearing();
 }
 
 void SwarmRobustness::Destroy()
@@ -154,7 +148,6 @@ CRadians SwarmRobustness::GetSwarmBearing()
       if(packet.Data[0] == POWER_FAILURE)
       {
          continue; // skip robots that are showing power failure.
-         argos::LOG << GetId() << ": Ignoring failed robot" << std::endl;
       }
       sum += packet.HorizontalBearing;
    }
@@ -170,7 +163,7 @@ void SwarmRobustness::SensorFailure()
 
 void SwarmRobustness::RABAFailure()
 {
-   m_pcRABA->SetData(1, POWER_FAILURE);
+   m_pcRABA->SetData(0, POWER_FAILURE);
 }
 
 /*
