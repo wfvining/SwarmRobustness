@@ -102,5 +102,11 @@ private:
     * Set up sensors to simulate sensor failure.
     */
    void SensorFailure();
+   /**
+    * Simulate a RABA Failure. This is used for the power failure
+    * case, to signal to other robots that the failed robot should be
+    * ignored.
+    */
+   void RABAFailure();
 };
 #endif
