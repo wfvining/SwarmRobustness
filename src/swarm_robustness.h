@@ -61,7 +61,8 @@ public:
 
 private:
 
-   enum FailureMode {
+   enum FailureMode
+   {
       NO_FAILURE = 0, /* Robots magically do not fail      */
       MOTOR_FAILURE,  /* failure of a robot's motors only  */
       POWER_FAILURE,  /* complete failure of a robot       */
@@ -75,6 +76,10 @@ private:
       sensor*/
    bool beacon_detected;
    const int turn_threshold = 100; // TODO: define this as a time
+
+   // Determine if the robot is performing flocking behavior
+   bool flocking = false;
+   int time_since_collision = 0;
 
    /* Pointer to the differential steering actuator */
    CCI_DifferentialSteeringActuator* m_pcWheels;
@@ -97,5 +102,11 @@ private:
     * Set up sensors to simulate sensor failure.
     */
    void SensorFailure();
+   /**
+    * Simulate a RABA Failure. This is used for the power failure
+    * case, to signal to other robots that the failed robot should be
+    * ignored.
+    */
+   void RABAFailure();
 };
 #endif
