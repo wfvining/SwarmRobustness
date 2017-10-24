@@ -64,9 +64,6 @@ void SwarmRobustness::ControlStep()
 
                                    //rightwheel, leftwheel
     m_pcWheels->SetLinearVelocity(wheeldata.rwVel, wheeldata.lwVel);
-
-    argos::LOG << "Wheel Speeds Left:" << wheeldata.lwVel << "Right:  " << wheeldata.rwVel << std::endl;
-
 }
 
 void SwarmRobustness::Destroy()
@@ -148,6 +145,10 @@ CRadians SwarmRobustness::GetSwarmBearing()
    CRadians sum(0.0);
    for( auto packet : readings )
    {
+      if(packet.Data[0] == POWER_FAILURE)
+      {
+         continue; // skip robots that are showing power failure.
+      }
       sum += packet.HorizontalBearing;
    }
 
@@ -158,6 +159,11 @@ CRadians SwarmRobustness::GetSwarmBearing()
 void SwarmRobustness::SensorFailure()
 {
    failed = SENSOR_FAILURE;
+}
+
+void SwarmRobustness::RABAFailure()
+{
+   m_pcRABA->SetData(0, POWER_FAILURE);
 }
 
 /*
