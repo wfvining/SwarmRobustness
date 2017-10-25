@@ -16,6 +16,8 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 /* Logging */
 #include <argos3/core/utility/logging/argos_log.h>
+/* Argos RNG */
+#include <argos3/core/utility/math/rng.h>
 
 #include "data.h"
 #include "obstacle.h"
@@ -27,7 +29,6 @@ class SwarmRobustness : public CCI_Controller
 public:
    SwarmRobustness();
    virtual ~SwarmRobustness();
-
    /*
     * This function initializes the controller.
     * The 't_node' variable points to the <parameters> section in the XML
@@ -70,6 +71,7 @@ private:
    } failure_mode;
    FailureMode failed = NO_FAILURE;
 
+   CRandom::CRNG *rand;
    ObstSensors obstsense;
 
    /* indicates whether the beacon has been detetected by the lignt
