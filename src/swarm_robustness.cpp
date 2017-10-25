@@ -88,23 +88,23 @@ void SwarmRobustness::ControlStep()
     //Obstacle Avoidance
 
     //Set Variables to 0;
-    obstsense.distance = m_pcProximity->GetReadings()[0];
+    obstsense.distance = m_pcProximity->GetReadings()[0]+rand->Gaussian(0.0, 0.1);
     obstsense.sensorID = 0;
 
     //Determine which sensor has a closer obstacle
-    if(obstsense.distance < m_pcProximity->GetReadings()[1])
+    if(obstsense.distance < m_pcProximity->GetReadings()[1]+rand->Gaussian(0.0, 0.1))
     {
        obstsense.distance = m_pcProximity->GetReadings()[1];
        obstsense.sensorID = 1;
     }
 
-    if(obstsense.distance < m_pcProximity->GetReadings()[7])
+    if(obstsense.distance < m_pcProximity->GetReadings()[7]+rand->Gaussian(0.0, 0.1))
     {
        obstsense.distance = m_pcProximity->GetReadings()[7];
        obstsense.sensorID = 7;
     }
 
-    if(obstsense.distance < m_pcProximity->GetReadings()[6])
+    if(obstsense.distance < m_pcProximity->GetReadings()[6]+rand->Gaussian(0.0, 0.1))
     {
        obstsense.distance = m_pcProximity->GetReadings()[6];
        obstsense.sensorID = 6;
@@ -148,12 +148,6 @@ void SwarmRobustness::ControlStep()
 
             // Get Error
             CRadians errorBackToSwarm = GetSwarmBearing();
-
-            // Pick a direction to turn to mitigate osillation
-            static bool pickedDirection = false;
-
-            // Which direction they chose to turn
-            static bool turningRight = false;
 
             // Determine if we are turning right or left
             if(!pickedDirection)

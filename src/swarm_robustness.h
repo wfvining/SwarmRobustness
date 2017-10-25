@@ -74,6 +74,11 @@ private:
    CRandom::CRNG *rand;
    ObstSensors obstsense;
 
+   // Pick a direction to turn to mitigate osillation
+   bool pickedDirection = false;
+   // Which direction they chose to turn
+   bool turningRight = false;
+
    /* indicates whether the beacon has been detetected by the lignt
       sensor*/
    bool beacon_detected;
