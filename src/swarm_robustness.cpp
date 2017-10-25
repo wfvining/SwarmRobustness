@@ -44,16 +44,19 @@ void SwarmRobustness::ControlStep()
     obstsense.distance = m_pcProximity->GetReadings()[0];
     obstsense.sensorID = 0;
 
+    //Determine which sensor has a closer obstacle
     if(obstsense.distance < m_pcProximity->GetReadings()[1])
     {
        obstsense.distance = m_pcProximity->GetReadings()[1];
        obstsense.sensorID = 1;
     }
+
     if(obstsense.distance < m_pcProximity->GetReadings()[7])
     {
        obstsense.distance = m_pcProximity->GetReadings()[7];
        obstsense.sensorID = 7;
     }
+
     if(obstsense.distance < m_pcProximity->GetReadings()[6])
     {
        obstsense.distance = m_pcProximity->GetReadings()[6];
@@ -64,9 +67,14 @@ void SwarmRobustness::ControlStep()
     Obstacle obstController;
     obstController.SetAvoidanceRadius(BeaconInSight());
 
+    //React to obstacle
     if(obstController.ShouldAvoid(&obstsense))
     {
+
+        argos::LOG << GetId() << "Avoiding from sensor:  " << obstsense.sensorID << std::endl;
+
         time_since_collision = 0;
+
         if(obstsense.turnRight)
         {
             wheeldata.rwVel = 5.0;
@@ -96,26 +104,55 @@ void SwarmRobustness::ControlStep()
             // Get Error
             CRadians errorBackToSwarm = GetSwarmBearing();
 
+            // Pick a direction to turn to mitigate osillation
+            static bool pickedDirection = false;
+
+            // Which direction they chose to turn
+            static bool turningRight = false;
+
             // Determine if we are turning right or left
-            if(errorBackToSwarm > CRadians(0.0))
+            if(!pickedDirection)
             {
-                // RIGHT
-                wheeldata.lwVel = 0.0;
-                wheeldata.rwVel = 5.0;
+                if(errorBackToSwarm > CRadians(0.0))
+                {
+                    turningRight = true;
+                }
+                else
+                {
+                    turningRight = false;
+                }
+
+                pickedDirection = true;
             }
-            else
+
+            if(pickedDirection)
             {
-                // LEFT
-                wheeldata.lwVel = 0.0;
-                wheeldata.rwVel = 5.0;
+                if(turningRight)
+                {
+                    // RIGHT
+                    wheeldata.rwVel = 5.0;
+                    wheeldata.lwVel = 0.0;
+                }
+                else
+                {
+                    // LEFT
+                    wheeldata.lwVel = 0.0;
+                    wheeldata.rwVel = 5.0;
+                }
             }
 
             // check error, if below, turn flocking behavior off
             if(errorBackToSwarm <= CRadians(0.05) && errorBackToSwarm >= CRadians(-0.05))
             {
+                // Stops Flocking Behavior
                 flocking = false;
+
+                // Resets code to choose which direction to turn
+                pickedDirection = false;
+
                 wheeldata.lwVel = 5.0;
                 wheeldata.rwVel = 5.0;
+
                 time_since_collision = 0;
             }
 
@@ -124,6 +161,7 @@ void SwarmRobustness::ControlStep()
         {
             flocking = true;
         }
+
         //otherwise drive straight
         else
         {
@@ -249,5 +287,3 @@ void SwarmRobustness::RABAFailure()
  * See also the XML configuration files for an example of how this is used.
  */
 REGISTER_CONTROLLER(SwarmRobustness, "swarm_robustness_controller")
-
-
