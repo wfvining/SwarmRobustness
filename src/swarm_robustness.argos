@@ -7,7 +7,7 @@
   <framework>
     <system threads="0" />
     <!-- Length will determine how long to run the experiment -->
-    <experiment length="800"
+    <experiment length="1600"
                 ticks_per_second="20"
                 random_seed="0" />
   </framework>
@@ -24,8 +24,8 @@
         <range_and_bearing implementation="default" range="10" />
       </actuators>
       <sensors>
-        <proximity implementation="default" show_rays="true" />
-        <light implementation="default" show_rays="true" />
+        <proximity implementation="default" show_rays="false" />
+        <light implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="1" />
       </sensors>
       <!-- Failure Modes     -->
@@ -42,7 +42,7 @@
 
       <!-- max_fail -->
       <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
-      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="10" max_fail="500"/>
+      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="20" max_fail="500"/>
     </swarm_robustness_controller>
 
   </controllers>
