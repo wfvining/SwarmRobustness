@@ -24,8 +24,8 @@ public:
   void SetAvoidanceRadius(bool beacon_in_sight);
 
 private:
-  const Real BASE_RADIUS = 0.02f;
-   const Real AVOIDANCE_SHIFT = 0.079f;
+  const Real BASE_RADIUS = 0.05f;
+  const Real AVOIDANCE_SHIFT = BASE_RADIUS;
   Real avoidance_radius = BASE_RADIUS;
 };
 
