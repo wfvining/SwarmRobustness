@@ -7,8 +7,8 @@
   <framework>
     <system threads="0" />
     <!-- Length will determine how long to run the experiment -->
-    <experiment length="1800"
-                ticks_per_second="10"
+    <experiment length="800"
+                ticks_per_second="20"
                 random_seed="0" />
   </framework>
 
@@ -42,7 +42,7 @@
 
       <!-- max_fail -->
       <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
-      <params velocity="5" failure_mode="1" failure_rate="10" num_robots="10" max_fail="100"/>
+      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="10" max_fail="500"/>
     </swarm_robustness_controller>
 
   </controllers>
@@ -54,7 +54,7 @@
 
     <!-- Put the LED light next to the west wall -->
     <light id="light"
-       position="-3.85,0,0.1"
+       position="-3,0,0.1"
        orientation="0,0,0"
        color="yellow"
        intensity="3.0"
@@ -78,7 +78,7 @@
       <position method="uniform" min="-1,-1,0" max="0,0  ,0" />
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
       <!-- Entity means number of robots -->
-      <entity quantity="10" max_trials="100">
+      <entity quantity="30" max_trials="100">
         <e-puck id="fb">
           <controller config="fdc" />
         </e-puck>
