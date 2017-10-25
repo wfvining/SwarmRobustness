@@ -95,7 +95,7 @@ private:
     * Check the light sensor beacon to determine if the beacon is in
     * sight.
     */
-   void BeaconInSight();
+   bool BeaconInSight();
    CRadians GetSwarmBearing();
    int TimeSinceLastAvoidanceCall();
    /**

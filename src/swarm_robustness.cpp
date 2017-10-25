@@ -1,5 +1,7 @@
 #include "swarm_robustness.h"
 
+#include <math.h>
+
 SwarmRobustness::SwarmRobustness()
 {
     //Constructor
@@ -60,19 +62,20 @@ void SwarmRobustness::ControlStep()
 
     //Create ObstController
     Obstacle obstController;
+    obstController.SetAvoidanceRadius(BeaconInSight());
 
     if(obstController.ShouldAvoid(&obstsense))
     {
         time_since_collision = 0;
         if(obstsense.turnRight)
         {
-            wheeldata.rwVel = 2.5;
+            wheeldata.rwVel = 5.0;
             wheeldata.lwVel = 0;
         }
         else
         {
             wheeldata.rwVel = 0;
-            wheeldata.lwVel = 2.5;
+            wheeldata.lwVel = 5.0;
         }
     }
     else
@@ -92,29 +95,28 @@ void SwarmRobustness::ControlStep()
 
             // Get Error
             CRadians errorBackToSwarm = GetSwarmBearing();
-            argos::LOG << GetId() << ": swarm bearing " << GetSwarmBearing() << std::endl;
 
             // Determine if we are turning right or left
             if(errorBackToSwarm > CRadians(0.0))
             {
                 // RIGHT
                 wheeldata.lwVel = 0.0;
-                wheeldata.rwVel = 2.5;
+                wheeldata.rwVel = 5.0;
             }
             else
             {
                 // LEFT
                 wheeldata.lwVel = 0.0;
-                wheeldata.rwVel = 2.5;
+                wheeldata.rwVel = 5.0;
             }
 
             // check error, if below, turn flocking behavior off
             if(errorBackToSwarm <= CRadians(0.05) && errorBackToSwarm >= CRadians(-0.05))
             {
-                argos::LOG << "done flocking" << std::endl;
                 flocking = false;
-                wheeldata.lwVel = 2.5;
-                wheeldata.rwVel = 2.5;
+                wheeldata.lwVel = 5.0;
+                wheeldata.rwVel = 5.0;
+                time_since_collision = 0;
             }
 
         }
@@ -125,8 +127,8 @@ void SwarmRobustness::ControlStep()
         //otherwise drive straight
         else
         {
-            wheeldata.lwVel = 2.5;
-            wheeldata.rwVel = 2.5;
+            wheeldata.lwVel = 5.0;
+            wheeldata.rwVel = 5.0;
         }
     }
 
@@ -174,12 +176,11 @@ int SwarmRobustness::TimeSinceLastAvoidanceCall()
    return 10; // TODO: actually return something true
 }
 
-void SwarmRobustness::BeaconInSight()
+bool SwarmRobustness::BeaconInSight()
 {
    if(failed == SENSOR_FAILURE)
    {
-      beacon_detected = false;
-      return;
+      return false;
    }
    
    Real total_reading = 0.0;
@@ -193,11 +194,11 @@ void SwarmRobustness::BeaconInSight()
    // readings are 1
    if(total_reading / readings.size() >= 0.33)
    {
-      beacon_detected = true;
+      return true;
    }
    else
    {
-      beacon_detected = false;
+      return false;
    }
 }
 

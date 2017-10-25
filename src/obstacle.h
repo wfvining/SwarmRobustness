@@ -21,9 +21,12 @@ public:
 
   bool ShouldAvoid(ObstSensors *data);
   void Avoid(DATA *info);
+  void SetAvoidanceRadius(bool beacon_in_sight);
 
 private:
-
+  const Real BASE_RADIUS = 0.01f;
+   const Real AVOIDANCE_SHIFT = 0.08f;
+  Real avoidance_radius = BASE_RADIUS;
 };
 
 #endif
