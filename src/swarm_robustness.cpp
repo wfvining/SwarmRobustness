@@ -118,8 +118,6 @@ void SwarmRobustness::ControlStep()
     if(obstController.ShouldAvoid(&obstsense))
     {
 
-        argos::LOG << GetId() << "Avoiding from sensor:  " << obstsense.sensorID << std::endl;
-
         time_since_collision = 0;
 
         if(obstsense.turnRight)

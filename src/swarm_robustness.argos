@@ -7,7 +7,7 @@
   <framework>
     <system threads="0" />
     <!-- Length will determine how long to run the experiment -->
-    <experiment length="0"
+    <experiment length="1800"
                 ticks_per_second="10"
                 random_seed="0" />
   </framework>
@@ -42,7 +42,7 @@
 
       <!-- max_fail -->
       <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
-      <params velocity="5" failure_mode="1" failure_rate="100" num_robots="5" max_fail="100"/>
+      <params velocity="5" failure_mode="1" failure_rate="10" num_robots="10" max_fail="100"/>
     </swarm_robustness_controller>
 
   </controllers>
@@ -75,10 +75,10 @@
 
     <!-- Distribute our robots in a cluster near the east wall -->
     <distribute>
-      <position method="uniform" min="0.5,-0.5,0" max="1.5,0.5,0" />
+      <position method="uniform" min="-1,-1,0" max="0,0  ,0" />
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
-      <!-- Entity means number of robots. Max_trials can be used instead of a bash script. -->
-      <entity quantity="5" max_trials="100">
+      <!-- Entity means number of robots -->
+      <entity quantity="10" max_trials="100">
         <e-puck id="fb">
           <controller config="fdc" />
         </e-puck>
