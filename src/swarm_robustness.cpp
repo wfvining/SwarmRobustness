@@ -1,18 +1,11 @@
 #include "swarm_robustness.h"
 #include <stdlib.h>
-#include <time.h>
+#include <math.h>
 #include <argos3/core/utility/math/rng.h>
  
  
-// Feel free to tune the following variables
-int failureThreshold = 30; // 10 = 10% chance of failure, 50 = 50% chance of failure
-int maxFail = 165; /* maxFail represents the latest that a robot is allowed to die at. 
-  * Scale is n = n*10 steps (ex. 165 = step 1650 is latest that robot can die at) */
-
-
 // Values that do not require tuning.
 int hasScrambled = false;
-int maxBots = 120;
 int numTicks;
 bool robotFailList[120]; // Boolean value if corresponding robot is going to eventually fail
 int robotFailTime[120]; // Value of time that corresponding robot is supposed to fail
@@ -57,7 +50,7 @@ void SwarmRobustness::ControlStep()
          break;
       case POWER_FAILURE : // Complete failure of individual robot
          m_pcWheels->SetLinearVelocity(0, 0);
-         SensorFailure();
+         RABAFailure();
          return;
          break;
       case SENSOR_FAILURE : // Failure of a robot's IR sensors. Wanders around lost
@@ -192,70 +185,79 @@ void SwarmRobustness::Destroy() {   }
 
 void SwarmRobustness::Init(TConfigurationNode& t_node)
 {
-   m_pcWheels    = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
-   m_pcProximity = GetSensor  <CCI_ProximitySensor             >("proximity");
-   m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
-   m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
-   m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
-   // m_pcRNG       = CRandom::CreateRNG("argos");
+  m_pcWheels    = GetActuator<CCI_DifferentialSteeringActuator>("differential_steering");
+  m_pcProximity = GetSensor  <CCI_ProximitySensor             >("proximity");
+  m_pcLight     = GetSensor  <CCI_LightSensor                 >("light");
+  m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing");
+  m_pcRABA      = GetActuator<CCI_RangeAndBearingActuator     >("range_and_bearing");
 
-   rand = argos::CRandom::CreateRNG("argos");
-  // SInt32 argos::CRandom::CRNG::Uniform  ( const CRange< SInt32 > &  c_range ) 
+  rand = argos::CRandom::CreateRNG("argos");
+  int failureRate;
+  int numRobots;
+  int maxFail;
+  GetNodeAttributeOrDefault(t_node, "failure_rate", failureRate, 0);
+  GetNodeAttributeOrDefault(t_node, "num_robots", numRobots, 0);
+  GetNodeAttributeOrDefault(t_node, "max_fail", maxFail, 0);
+  maxFail = maxFail/10; //Conversion to number in top left corner of GUI
+    
+  if (!hasScrambled) {
+  int i = 0;
+  int time = -1;
+  double numToFail = numRobots * ((double)failureRate/100);
+  argos::LOG << "numToFail: " << numToFail << std::endl;
 
-
-
-   int i = 0;
-   int time = -1;
-   if (!hasScrambled) {
-      while(i < maxBots) {
-         // int fail = (rand() % 100) + 1;
-         int fail = rand->Uniform(argos::CRange<int>(0,100));
-         // argos::LOG << "i: " << i << " fail: " << fail << std::endl;
-
-         // If true then robot will fail. Now determine when to fail.
-         if (fail <= failureThreshold) {
-            // time = (rand() % maxFail) + 1;
-            time = rand->Uniform(argos::CRange<int>(0,maxFail));
-            // TODO: get different random values using just 1 build
-            argos::LOG << "time: " << time << std::endl;
-            // int george = (rand()*1.0f/RAND_MAX) * maxFail;
-            // argos::LOG << "george: " << george << std::endl;
-            robotFailTime[i] = time;
-            robotFailList[i] = true;
-         } else {
-            robotFailTime[i] = robotMaxTime;
-            robotFailList[i] = false;
-         }
-         // argos::LOG << "robot: " << i << " failTime: " << robotFailTime[i] << std::endl;
-         i++;
+    if(fmod(numToFail,1) != 0) {
+      // argos::LOG << "modulus: " << fmod(numToFail,1)  << std::endl;
+      int fail = rand->Uniform(argos::CRange<int>(0,100));
+      if (fail <= (int)fmod(numToFail,1)*100) {
+        time = rand->Uniform(argos::CRange<int>(0,maxFail));
+        robotFailTime[i] = time;
+        robotFailList[i] = true;
       }
-      hasScrambled = true;
-   }
-   numTicks = -1; // Must be set to -1 because how it is incremented in ControlStep
+      i++;
+    }
 
-   // get the failure mode from the config.
-   int fm;
-   GetNodeAttributeOrDefault(t_node, "failure_mode", fm, 0);
-   if(fm == 0)
-   {
-      failure_mode = NO_FAILURE;
-      argos::LOG << "failure mode: NO_FAILURE" << std::endl;
-   }
-   else if(fm == 1)
-   {
-      failure_mode = MOTOR_FAILURE;
-      argos::LOG << "failure mode: MOTOR_FAILURE" << std::endl;
-   }
-   else if(fm == 2)
-   {
-      failure_mode = POWER_FAILURE;
-      argos::LOG << "failure mode: POWER_FAILURE" << std::endl;
-   }
-   else if(fm == 3)
-   {
-      failure_mode = SENSOR_FAILURE;
-      argos::LOG << "failure mode: SENSOR_FAILURE" << std::endl;
-   }
+    // Set fail time for applicable robots
+    while(i < numToFail) {
+      time = rand->Uniform(argos::CRange<int>(0,maxFail));
+      robotFailList[i] = true;
+      robotFailTime[i] = time;
+       i++;
+    }
+
+    // Continue initializing other bots
+    while(i<numRobots){
+      robotFailTime[i] = robotMaxTime;
+      robotFailList[i] = false;
+      i++;
+    }
+    hasScrambled = true;
+  }
+  numTicks = -1; // Must be set to -1 because how it is incremented in ControlStep
+
+  // get the failure mode from the config.
+  int fm;
+  GetNodeAttributeOrDefault(t_node, "failure_mode", fm, 0);
+  if(fm == 0)
+  {
+    failure_mode = NO_FAILURE;
+    argos::LOG << "failure mode: NO_FAILURE" << std::endl;
+  }
+  else if(fm == 1)
+  {
+    failure_mode = MOTOR_FAILURE;
+    argos::LOG << "failure mode: MOTOR_FAILURE" << std::endl;
+  }
+  else if(fm == 2)
+  {
+    failure_mode = POWER_FAILURE;
+    argos::LOG << "failure mode: POWER_FAILURE" << std::endl;
+  }
+  else if(fm == 3)
+  {
+    failure_mode = SENSOR_FAILURE;
+    argos::LOG << "failure mode: SENSOR_FAILURE" << std::endl;
+  }
 }
 
 int SwarmRobustness::TimeSinceLastAvoidanceCall()
