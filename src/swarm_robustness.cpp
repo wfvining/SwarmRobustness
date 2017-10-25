@@ -111,7 +111,6 @@ void SwarmRobustness::ControlStep()
             // Determine if we are turning right or left
             if(!pickedDirection)
             {
-
                 if(errorBackToSwarm > CRadians(0.0))
                 {
                     turningRight = true;
@@ -153,6 +152,8 @@ void SwarmRobustness::ControlStep()
 
                 wheeldata.lwVel = 2.5;
                 wheeldata.rwVel = 2.5;
+
+                time_since_collision = 0;
             }
 
         }
