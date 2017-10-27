@@ -42,7 +42,7 @@ void logProgress(int numTicks, int myId, float x, float y) {
   }
 
   float distance = sqrt( (goal_x - x)*(goal_x - x) + (goal_y - y)  * (goal_y - y) );
-  argos::LOG << "myId[" << myId << "] x: " << x << " y: " << y << " distance: " << distance << std:: endl;
+  argos::LOG << "myId[" << myId << "] " << x << "," << y << "," << distance << std:: endl;
 }
 
 bool robotIsFailed(int robotId, int numTicks) {
