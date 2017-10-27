@@ -46,7 +46,7 @@
 
       <!-- max_fail -->
       <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
-      <params velocity="5" failure_mode="1" failure_rate="100" num_robots="30" max_fail="500" log_frequency="50"/>
+      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="30" max_fail="500" log_frequency="50"/>
     </swarm_robustness_controller>
 
   </controllers>

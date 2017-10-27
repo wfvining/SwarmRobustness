@@ -11,6 +11,8 @@ bool robotFailList[120]; // Boolean value if corresponding robot is going to eve
 int robotFailTime[120]; // Value of time that corresponding robot is supposed to fail
 int robotMaxTime = 99999999; // Constant used for robots that are not supposed to fail
 int logFrequency = 0;
+float goal_x = -3;
+float goal_y = 0;
 
 #include <math.h>
 
@@ -38,7 +40,9 @@ void logProgress(int numTicks, int myId, float x, float y) {
     argos::LOG << "*** TICK = " << numTicks << " ***" << std::endl;
     argos::LOG << "****************" << std::endl;
   }
-  argos::LOG << "myId[" << myId << "] x: " << x << " y: " << y << std:: endl;
+
+  float distance = sqrt( (goal_x - x)*(goal_x - x) + (goal_y - y)  * (goal_y - y) );
+  argos::LOG << "myId[" << myId << "] x: " << x << " y: " << y << " distance: " << distance << std:: endl;
 }
 
 bool robotIsFailed(int robotId, int numTicks) {
