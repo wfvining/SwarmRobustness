@@ -57,7 +57,7 @@
        position="-3,0,0.1"
        orientation="0,0,0"
        color="yellow"
-       intensity="3.0"
+       intensity="10.0"
        medium="leds" />
 
     <box id="wall_north" size="8,0.1,0.5" movable="false">
@@ -75,10 +75,10 @@
 
     <!-- Distribute our robots in a cluster near the east wall -->
     <distribute>
-      <position method="uniform" min="-1,-1,0" max="0,0  ,0" />
+      <position method="uniform" min="-.25,-.25,0" max=".25,.25,0" />
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
       <!-- Entity means number of robots -->
-      <entity quantity="30" max_trials="100">
+      <entity quantity="10" max_trials="100">
         <e-puck id="fb">
           <controller config="fdc" />
         </e-puck>
