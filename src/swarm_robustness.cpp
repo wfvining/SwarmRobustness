@@ -138,7 +138,7 @@ void SwarmRobustness::ControlStep()
 
         /*-----FLOCKING CODE-----*/
 
-        float tolerance = 50;
+        float tolerance = 40;
 
         // if dist >= tolerance
         if(flocking)
@@ -308,7 +308,8 @@ bool SwarmRobustness::BeaconInSight()
    const std::vector<Real> readings = m_pcLight->GetReadings();
    for(Real reading : readings)
    {
-      total_reading += reading;
+      if(reading == 1.0)
+         total_reading += reading;
    }
 
    // a robot can see the light if at least 1/3 of its light sensor
