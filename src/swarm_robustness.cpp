@@ -33,16 +33,11 @@ void logMySchedule(int id, int time, bool willFail) {
   }
 }
 
+// Prints:
+// <tick>,<id>,<x>,<y>,<distance>
 void logProgress(int numTicks, int myId, float x, float y) {
-  if(myId == 0) {
-    argos::LOG << "" << std::endl;
-    argos::LOG << "****************" << std::endl;
-    argos::LOG << "*** TICK = " << numTicks << " ***" << std::endl;
-    argos::LOG << "****************" << std::endl;
-  }
-
   float distance = sqrt( (goal_x - x)*(goal_x - x) + (goal_y - y)  * (goal_y - y) );
-  argos::LOG << "myId[" << myId << "] " << x << "," << y << "," << distance << std:: endl;
+  argos::LOG << numTicks << "," << myId << "," << x << "," << y << "," << distance << std:: endl;
 }
 
 bool robotIsFailed(int robotId, int numTicks) {
