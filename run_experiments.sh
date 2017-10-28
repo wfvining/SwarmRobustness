@@ -15,8 +15,11 @@ do
         wait -n
         let job_count--
     fi
-    argos3 -c $2 2>/dev/null | perl -pe 's/\e\[?.*?[\@-~]//g' | grep "^beacon reached" | cut -d ":" -f 2 > $3_$i.dat &
+    argos3 -c $2 2>/dev/null | perl -pe 's/\e\[?.*?[\@-~]//g' | grep "^beacon reached" | cut -d ":" -f 2 >> $3.dat &
     let job_count++
+    echo -n '.'
 done
+
+echo
 
 wait
