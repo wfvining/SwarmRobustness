@@ -36,8 +36,17 @@ void logMySchedule(int id, int time, bool willFail) {
 // Prints:
 // <tick>,<id>,<x>,<y>,<distance>
 void logProgress(int numTicks, int myId, float x, float y) {
+  static bool beacon_reached = false;
   float distance = sqrt( (goal_x - x)*(goal_x - x) + (goal_y - y)  * (goal_y - y) );
-  argos::LOG << numTicks << "," << myId << "," << x << "," << y << "," << distance << std:: endl;
+//  argos::LOG << numTicks << "," << myId << "," << x << "," << y << "," << distance << std:: endl;
+  if((distance < 0.25 || numTicks == 32000) && !beacon_reached) {
+     beacon_reached = true;
+     argos::LOG << "beacon reached: " << numTicks/20 << std::endl;;
+  }
+  if(numTicks == 32000 && !beacon_reached)
+  {
+     argos::LOG << "beacon reached: " << numTi
+  }
 }
 
 bool robotIsFailed(int robotId, int numTicks) {
