@@ -27,6 +27,10 @@
         <proximity implementation="default" show_rays="false" />
         <light implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="1" />
+        <positioning implementation="default"
+              pos_noise_range="-0.1:0.2"
+              angle_noise_range="-10.5:13.7"
+              axis_noise_range="-0.3:0.4"/>
       </sensors>
       <!-- Failure Modes     -->
       <!-- 0: NO_FAILURE     -->
@@ -42,7 +46,7 @@
 
       <!-- max_fail -->
       <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
-      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="20" max_fail="500"/>
+      <params velocity="5" failure_mode="1" failure_rate="0" num_robots="30" max_fail="500" log_frequency="50"/>
     </swarm_robustness_controller>
 
   </controllers>
