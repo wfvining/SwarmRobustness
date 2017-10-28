@@ -21,12 +21,12 @@
                                         library="build/src/libswarm_robustness.so">
       <actuators>
         <differential_steering implementation="default" />
-        <range_and_bearing implementation="default" range="10" />
+        <range_and_bearing implementation="default" range="20" />
       </actuators>
       <sensors>
         <proximity implementation="default" show_rays="false" />
         <light implementation="default" show_rays="false" />
-        <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="1" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="20" />
         <positioning implementation="default"
               pos_noise_range="-0.1:0.2"
               angle_noise_range="-10.5:13.7"
@@ -110,8 +110,8 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
-    <!-- Comment qt-opengl out in order to run headless -->
-    <qt-opengl />
+    <!-- Comment qt-opengl out in order to run headless
+    <qt-opengl /> -->
   </visualization>
 
 </argos-configuration>
