@@ -43,10 +43,6 @@ void logProgress(int numTicks, int myId, float x, float y) {
      beacon_reached = true;
      argos::LOG << "beacon reached: " << numTicks/20 << std::endl;;
   }
-  if(numTicks == 32000 && !beacon_reached)
-  {
-     argos::LOG << "beacon reached: " << numTi
-  }
 }
 
 bool robotIsFailed(int robotId, int numTicks) {
