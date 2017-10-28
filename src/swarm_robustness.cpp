@@ -88,23 +88,23 @@ void SwarmRobustness::ControlStep()
     //Obstacle Avoidance
 
     //Set Variables to 0;
-    obstsense.distance = m_pcProximity->GetReadings()[0]+rand->Gaussian(0.0, 0.1);
+    obstsense.distance = m_pcProximity->GetReadings()[0];
     obstsense.sensorID = 0;
 
     //Determine which sensor has a closer obstacle
-    if(obstsense.distance < m_pcProximity->GetReadings()[1]+rand->Gaussian(0.0, 0.1))
+    if(obstsense.distance < m_pcProximity->GetReadings()[1])
     {
        obstsense.distance = m_pcProximity->GetReadings()[1];
        obstsense.sensorID = 1;
     }
 
-    if(obstsense.distance < m_pcProximity->GetReadings()[7]+rand->Gaussian(0.0, 0.1))
+    if(obstsense.distance < m_pcProximity->GetReadings()[7])
     {
        obstsense.distance = m_pcProximity->GetReadings()[7];
        obstsense.sensorID = 7;
     }
 
-    if(obstsense.distance < m_pcProximity->GetReadings()[6]+rand->Gaussian(0.0, 0.1))
+    if(obstsense.distance < m_pcProximity->GetReadings()[6])
     {
        obstsense.distance = m_pcProximity->GetReadings()[6];
        obstsense.sensorID = 6;
@@ -122,13 +122,13 @@ void SwarmRobustness::ControlStep()
 
         if(obstsense.turnRight)
         {
-            wheeldata.rwVel = 5.0;
+            wheeldata.rwVel = 5.0+rand->Gaussian(0.0, 0.1);
             wheeldata.lwVel = 0;
         }
         else
         {
             wheeldata.rwVel = 0;
-            wheeldata.lwVel = 5.0;
+            wheeldata.lwVel = 5.0+rand->Gaussian(0.0,0.1);
         }
     }
     else
@@ -138,7 +138,7 @@ void SwarmRobustness::ControlStep()
 
         /*-----FLOCKING CODE-----*/
 
-        float tolerance = 40;
+        float tolerance = 30;
 
         // if dist >= tolerance
         if(flocking)
