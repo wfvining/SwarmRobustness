@@ -112,25 +112,27 @@ void SwarmRobustness::ControlStep()
     //Obstacle Avoidance
 
     //Set Variables to 0;
-    obstsense.distance = m_pcProximity->GetReadings()[0];
+   obstsense.distance = m_pcProximity->GetReadings()[0]+rand->Gaussian(0.0,0.05);
     obstsense.sensorID = 0;
 
     //Determine which sensor has a closer obstacle
-    if(obstsense.distance < m_pcProximity->GetReadings()[1])
+    Real shift = rand->Gaussian(0.0,0.05);
+    if(obstsense.distance < m_pcProximity->GetReadings()[1]+shift)
     {
-       obstsense.distance = m_pcProximity->GetReadings()[1];
+       obstsense.distance = m_pcProximity->GetReadings()[1]+shift;
        obstsense.sensorID = 1;
     }
-
-    if(obstsense.distance < m_pcProximity->GetReadings()[7])
+    shift = rand->Gaussian(0.0,0.05);
+    if(obstsense.distance < m_pcProximity->GetReadings()[7]+shift)
     {
-       obstsense.distance = m_pcProximity->GetReadings()[7];
+       obstsense.distance = m_pcProximity->GetReadings()[7]+shift;
        obstsense.sensorID = 7;
     }
 
-    if(obstsense.distance < m_pcProximity->GetReadings()[6])
+    shift = rand->Gaussian(0.0,0.05);
+    if(obstsense.distance < m_pcProximity->GetReadings()[6]+shift)
     {
-       obstsense.distance = m_pcProximity->GetReadings()[6];
+       obstsense.distance = m_pcProximity->GetReadings()[6]+shift;
        obstsense.sensorID = 6;
     }
 
@@ -146,13 +148,13 @@ void SwarmRobustness::ControlStep()
 
         if(obstsense.turnRight)
         {
-            wheeldata.rwVel = 5.0+rand->Gaussian(0.0, 0.1);
+            wheeldata.rwVel = 5.0+rand->Gaussian(0.0, 1.0);
             wheeldata.lwVel = 0;
         }
         else
         {
             wheeldata.rwVel = 0;
-            wheeldata.lwVel = 5.0+rand->Gaussian(0.0,0.1);
+            wheeldata.lwVel = 5.0+rand->Gaussian(0.0,1.0);
         }
     }
     else
