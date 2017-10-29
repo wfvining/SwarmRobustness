@@ -39,7 +39,7 @@ void logProgress(int numTicks, int myId, float x, float y) {
   static bool beacon_reached = false;
   float distance = sqrt( (goal_x - x)*(goal_x - x) + (goal_y - y)  * (goal_y - y) );
 //  argos::LOG << numTicks << "," << myId << "," << x << "," << y << "," << distance << std:: endl;
-  if((distance < 0.25 || numTicks == 32000) && !beacon_reached) {
+  if((distance < 0.25 || numTicks == 64000) && !beacon_reached) {
      beacon_reached = true;
      argos::LOG << "beacon reached: " << numTicks/20 << std::endl;;
   }
