@@ -1,0 +1,114 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <!-- Length will determine how long to run the experiment -->
+    <experiment length="3200"
+                ticks_per_second="20"
+                random_seed="0" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <swarm_robustness_controller id="fdc"
+                                        library="build/src/libswarm_robustness.so">
+      <actuators>
+        <differential_steering implementation="default" />
+        <range_and_bearing implementation="default" range="20" />
+      </actuators>
+      <sensors>
+        <proximity implementation="default" show_rays="false" />
+        <light implementation="default" show_rays="false" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" range="20" />
+        <positioning implementation="default" />
+      </sensors>
+      <!-- Failure Modes     -->
+      <!-- 0: NO_FAILURE     -->
+      <!-- 1: MOTOR_FAILURE  -->
+      <!-- 2: POWER_FAILURE  -->
+      <!-- 3: SENSOR_FAILURE -->
+
+      <!-- Failure Rate -->
+      <!-- ex. 10 = 10% will fail -->
+
+      <!-- num_robots -->
+      <!-- Must match value in distribute//quantity tag -->
+
+      <!-- max_fail -->
+      <!-- ex. 50 = Latest bot can fail is at 50 shown in top left corner of GUI -->
+      <params velocity="5" failure_mode="1" failure_rate="20" num_robots="10" max_fail="500" log_frequency="50"/>
+    </swarm_robustness_controller>
+
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="10, 10, 1" center="0,0,0.5">
+
+    <!-- Put the LED light next to the west wall -->
+    <light id="light"
+       position="-3,0,0.1"
+       orientation="0,0,0"
+       color="yellow"
+       intensity="10.0"
+       medium="leds" />
+
+    <box id="wall_north" size="8,0.1,0.5" movable="false">
+      <body position="0,4,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="8,0.1,0.5" movable="false">
+      <body position="0,-4,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.1,8,0.5" movable="false">
+      <body position="4,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.1,8,0.5" movable="false">
+      <body position="-4,0,0" orientation="0,0,0" />
+    </box>
+
+    <!-- Distribute our robots in a cluster near the east wall -->
+    <distribute>
+      <position method="uniform" min="-.25,-0.25,0" max=".25,.25,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <!-- Entity means number of robots -->
+      <entity quantity="10" max_trials="100">
+        <e-puck id="fb">
+          <controller config="fdc" />
+        </e-puck>
+      </entity>
+    </distribute>
+
+  </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <led id="leds" />
+    <range_and_bearing id="rab" />
+  </media>
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <!-- Comment qt-opengl out in order to run headless
+    <qt-opengl /> -->
+  </visualization>
+
+</argos-configuration>
